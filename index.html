@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mileage Threshold</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00695C, #004D40);
+            /* UKG themed green */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #004D40;
+        }
+
+        .stat {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .threshold-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 6px 14px;
+            background: #00897B;
+            /* UKG teal */
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-radius: 20px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .threshold-badge.updated {
+            background: #004D40;
+            transform: scale(1.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #374151;
+            text-align: left;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #b2dfdb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #00897B;
+            box-shadow: 0 0 0 2px #80CBC4;
+        }
+
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #00897B;
+            /* UKG teal */
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #00695C;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            color: #1B5E20;
+            background: #C8E6C9;
+            padding: 8px;
+            border-radius: 8px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Mileage Threshold</h1>
+
+        <div class="stat">
+            Current Threshold:
+            <span class="threshold-badge" id="currentThreshold">20</span> miles
+        </div>
+
+        <div>
+            <label for="thresholdInput">Enter New Threshold</label>
+            <input type="number" id="thresholdInput" min="0" placeholder="e.g. 15" />
+            <button onclick="saveThreshold()">Update Threshold</button>
+            <div id="confirmation" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        const currentThresholdEl = document.getElementById("currentThreshold");
+        const thresholdInput = document.getElementById("thresholdInput");
+        const confirmationEl = document.getElementById("confirmation");
+
+        const LS_THRESHOLD = "mileage_threshold";
+
+        let threshold = localStorage.getItem(LS_THRESHOLD) ? Number(localStorage.getItem(LS_THRESHOLD)) : 5;
+        currentThresholdEl.textContent = threshold.toLocaleString();
+
+        function saveThreshold() {
+            const value = Number(thresholdInput.value);
+            if (!Number.isFinite(value) || value < 0) {
+                confirmationEl.style.display = "block";
+                confirmationEl.textContent = "Please enter a valid non-negative number.";
+                confirmationEl.style.color = "#B71C1C";
+                confirmationEl.style.background = "#FFCDD2";
+                return;
+            }
+            threshold = value;
+            localStorage.setItem(LS_THRESHOLD, threshold);
+            currentThresholdEl.textContent = threshold.toLocaleString();
+
+            // Highlight animation on update
+            currentThresholdEl.classList.add("updated");
+            setTimeout(() => currentThresholdEl.classList.remove("updated"), 600);
+
+            // Show confirmation
+            confirmationEl.style.display = "block";
+            confirmationEl.textContent = "Threshold saved successfully!";
+            confirmationEl.style.color = "#1B5E20";
+            confirmationEl.style.background = "#C8E6C9";
+            thresholdInput.value = "";
+
+            // Auto-hide confirmation after 3s
+            setTimeout(() => {
+                confirmationEl.style.display = "none";
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
